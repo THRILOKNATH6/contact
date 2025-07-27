@@ -25,14 +25,28 @@ try {
     $pdo->exec("USE $database");
     
     // Read and execute schema file
-    $schema = file_get_contents('database/schema.sql');
+    $schema_file = 'database/schema.sql';
+    if (!file_exists($schema_file)) {
+        $schema_file = 'database/schema_simple.sql';
+    }
+    
+    $schema = file_get_contents($schema_file);
     
     // Split the schema into individual statements
     $statements = array_filter(array_map('trim', explode(';', $schema)));
     
     foreach ($statements as $statement) {
         if (!empty($statement) && !preg_match('/^--/', $statement)) {
-            $pdo->exec($statement);
+            try {
+                $pdo->exec($statement);
+                echo "Executed: " . substr($statement, 0, 50) . "...<br>";
+            } catch (PDOException $e) {
+                echo "Warning: " . $e->getMessage() . "<br>";
+                echo "Statement: " . substr($statement, 0, 100) . "...<br>";
+                
+                // Try to continue with next statement
+                continue;
+            }
         }
     }
     

@@ -1,9 +1,16 @@
--- File Management System Database Schema (Fixed Version)
+-- File Management System Database Schema (Simple Version - No Foreign Keys)
+-- Use this if you encounter foreign key constraint errors
 
 CREATE DATABASE IF NOT EXISTS file_management;
 USE file_management;
 
--- Users table (without foreign keys initially)
+-- Drop tables if they exist (in correct order)
+DROP TABLE IF EXISTS files;
+DROP TABLE IF EXISTS records;
+DROP TABLE IF EXISTS forms;
+DROP TABLE IF EXISTS users;
+
+-- Users table
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -53,27 +60,10 @@ CREATE TABLE files (
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insert default manager user first
+-- Insert default manager user
 INSERT INTO users (username, password_hash, role, status) VALUES 
 ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ie_manager', 'approved');
 -- Password: password
-
--- Now add foreign key constraints after tables are created
-ALTER TABLE users 
-ADD CONSTRAINT fk_users_incharge FOREIGN KEY (incharge_id) REFERENCES users(id) ON DELETE SET NULL,
-ADD CONSTRAINT fk_users_manager FOREIGN KEY (manager_id) REFERENCES users(id) ON DELETE SET NULL;
-
-ALTER TABLE forms 
-ADD CONSTRAINT fk_forms_created_by FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE;
-
-ALTER TABLE records 
-ADD CONSTRAINT fk_records_form FOREIGN KEY (form_id) REFERENCES forms(id) ON DELETE CASCADE,
-ADD CONSTRAINT fk_records_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-ADD CONSTRAINT fk_records_committed_by FOREIGN KEY (committed_by) REFERENCES users(id) ON DELETE SET NULL;
-
-ALTER TABLE files 
-ADD CONSTRAINT fk_files_record FOREIGN KEY (record_id) REFERENCES records(id) ON DELETE CASCADE,
-ADD CONSTRAINT fk_files_uploaded_by FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE CASCADE;
 
 -- Create indexes for better performance
 CREATE INDEX idx_users_role ON users(role);
