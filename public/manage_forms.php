@@ -15,8 +15,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = $_POST['name'] ?? '';
             $description = $_POST['description'] ?? '';
             $fields = json_decode($_POST['fields'], true) ?? [];
+            $allowed_roles = isset($_POST['allowed_roles']) ? implode(',', $_POST['allowed_roles']) : 'ie,ie_incharge,ie_manager';
+            $status = $_POST['status'] ?? 'active';
             
-            if ($form->createForm($name, $description, $fields, $auth->getCurrentUserId())) {
+            if ($form->createForm($name, $description, $fields, $auth->getCurrentUserId(), $allowed_roles, $status)) {
                 $message = '<div class="alert alert-success">Form created successfully!</div>';
             } else {
                 $message = '<div class="alert alert-danger">Failed to create form.</div>';
@@ -26,8 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = $_POST['name'] ?? '';
             $description = $_POST['description'] ?? '';
             $fields = json_decode($_POST['fields'], true) ?? [];
+            $allowed_roles = isset($_POST['allowed_roles']) ? implode(',', $_POST['allowed_roles']) : 'ie,ie_incharge,ie_manager';
+            $status = $_POST['status'] ?? 'active';
             
-            if ($form->updateForm($form_id, $name, $description, $fields)) {
+            if ($form->updateForm($form_id, $name, $description, $fields, $allowed_roles, $status)) {
                 $message = '<div class="alert alert-success">Form updated successfully!</div>';
             } else {
                 $message = '<div class="alert alert-danger">Failed to update form.</div>';
@@ -137,6 +141,11 @@ if (isset($_GET['edit'])) {
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="forms_overview.php">
+                                <i class="fas fa-list-alt me-2"></i>Forms Overview
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="files.php">
                                 <i class="fas fa-folder me-2"></i>Files
                             </a>
@@ -176,6 +185,8 @@ if (isset($_GET['edit'])) {
                                                 <th>ID</th>
                                                 <th>Name</th>
                                                 <th>Description</th>
+                                                <th>Status</th>
+                                                <th>Allowed Roles</th>
                                                 <th>Created By</th>
                                                 <th>Created Date</th>
                                                 <th>Actions</th>
@@ -187,6 +198,20 @@ if (isset($_GET['edit'])) {
                                                     <td><?php echo $form_data['id']; ?></td>
                                                     <td><strong><?php echo htmlspecialchars($form_data['name']); ?></strong></td>
                                                     <td><?php echo htmlspecialchars($form_data['description']); ?></td>
+                                                    <td>
+                                                        <span class="badge <?php echo $form_data['status'] === 'active' ? 'bg-success' : 'bg-secondary'; ?>">
+                                                            <?php echo ucfirst($form_data['status']); ?>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <?php 
+                                                        $roles = explode(',', $form_data['allowed_roles']);
+                                                        foreach ($roles as $role) {
+                                                            $role_name = str_replace('_', ' ', $role);
+                                                            echo '<span class="badge bg-info me-1">' . ucfirst($role_name) . '</span>';
+                                                        }
+                                                        ?>
+                                                    </td>
                                                     <td><?php echo htmlspecialchars($form_data['created_by_name']); ?></td>
                                                     <td><?php echo date('M j, Y', strtotime($form_data['created_at'])); ?></td>
                                                     <td>
@@ -240,6 +265,30 @@ if (isset($_GET['edit'])) {
                                 <div class="mb-3">
                                     <label for="formDescription" class="form-label">Description</label>
                                     <textarea class="form-control" id="formDescription" name="description" rows="3"></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="formStatus" class="form-label">Status</label>
+                                    <select class="form-select" id="formStatus" name="status">
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Who can use this form?</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="ie" id="roleIE" name="allowed_roles[]" checked>
+                                        <label class="form-check-label" for="roleIE">IE</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="ie_incharge" id="roleIncharge" name="allowed_roles[]" checked>
+                                        <label class="form-check-label" for="roleIncharge">IE Incharge</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="ie_manager" id="roleManager" name="allowed_roles[]" checked>
+                                        <label class="form-check-label" for="roleManager">IE Manager</label>
+                                    </div>
                                 </div>
                                 
                                 <h6>Add Fields</h6>
@@ -425,7 +474,14 @@ if (isset($_GET['edit'])) {
             document.getElementById('formId').value = '<?php echo $edit_form['id']; ?>';
             document.getElementById('formName').value = '<?php echo addslashes($edit_form['name']); ?>';
             document.getElementById('formDescription').value = '<?php echo addslashes($edit_form['description']); ?>';
+            document.getElementById('formStatus').value = '<?php echo $edit_form['status']; ?>';
             document.getElementById('formModalLabel').textContent = 'Edit Form';
+            
+            // Set allowed roles
+            const allowedRoles = '<?php echo $edit_form['allowed_roles']; ?>'.split(',');
+            document.querySelectorAll('input[name="allowed_roles[]"]').forEach(checkbox => {
+                checkbox.checked = allowedRoles.includes(checkbox.value);
+            });
             
             formFields = <?php echo json_encode($edit_form['fields']); ?>;
             updateFormPreview();

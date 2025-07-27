@@ -69,7 +69,7 @@ if ($current_role === 'ie_manager') {
     $records = $record->getRecordsByUser($current_user_id);
 }
 
-$forms = $form->getAllForms();
+$forms = $form->getAllForms($current_role);
 $selected_form = null;
 if (isset($_GET['form_id'])) {
     $selected_form = $form->getFormById(intval($_GET['form_id']));
@@ -159,6 +159,11 @@ if (isset($_GET['form_id'])) {
                         <li class="nav-item">
                             <a class="nav-link active" href="records.php">
                                 <i class="fas fa-database me-2"></i>Records
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="forms_overview.php">
+                                <i class="fas fa-list-alt me-2"></i>Forms Overview
                             </a>
                         </li>
                         <li class="nav-item">

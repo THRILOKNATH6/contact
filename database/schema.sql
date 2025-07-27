@@ -25,6 +25,8 @@ CREATE TABLE forms (
     description TEXT,
     fields_json TEXT NOT NULL,
     created_by INT NOT NULL,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    allowed_roles TEXT DEFAULT 'ie,ie_incharge,ie_manager',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE

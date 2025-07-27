@@ -106,6 +106,11 @@ $pending_users = $user->getPendingUsers();
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="forms_overview.php">
+                                <i class="fas fa-list-alt me-2"></i>Forms Overview
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="files.php">
                                 <i class="fas fa-folder me-2"></i>Files
                             </a>

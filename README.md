@@ -12,10 +12,14 @@ A comprehensive PHP-based file and record management system with three user leve
 ### Core Functionality
 - **User Registration**: Requires manager approval for all new accounts
 - **Dynamic Forms**: Managers can create custom input forms with various field types
+- **Form Permissions**: Configure which user roles can access specific forms
+- **Form Management**: Full CRUD operations on forms even after creation
 - **Record Management**: Create, edit, and commit records with access control
 - **File Upload**: Attach files to records with proper permissions
 - **Commit System**: Once committed, records can only be edited by managers
 - **Role-based Dashboards**: Different interfaces for each user level
+- **Comprehensive Filtering**: Advanced filter options for forms, records, dates, and users
+- **Forms Overview**: Centralized view of all forms with statistics and filtering
 
 ### Technical Features
 - Responsive Bootstrap 5 UI with modern design
@@ -93,6 +97,10 @@ file-management-system/
 │   ├── manage_users.php    # User management (Manager only)
 │   ├── manage_forms.php    # Form builder (Manager only)
 │   ├── records.php         # Record management
+│   ├── forms_overview.php  # Comprehensive forms view with filtering
+│   ├── form_records.php    # View all records for specific form
+│   ├── view_record.php     # Individual record viewing
+│   ├── download.php        # Secure file downloads
 │   ├── files.php           # File management
 │   └── logout.php          # Logout functionality
 ├── uploads/                 # File storage directory

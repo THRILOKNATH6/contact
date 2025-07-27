@@ -2,7 +2,7 @@
 require_once '../config/database.php';
 
 class Record {
-    private $conn;
+    public $conn;
     
     public function __construct() {
         $database = new Database();
